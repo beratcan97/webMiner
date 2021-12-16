@@ -1,4 +1,4 @@
-import { Component, OnInit, NgZone} from '@angular/core';
+import { Component, OnInit, NgZone, ChangeDetectorRef} from '@angular/core';
 import { webSocket, WebSocketSubject } from "rxjs/webSocket";
 
 @Component({
@@ -9,10 +9,11 @@ import { webSocket, WebSocketSubject } from "rxjs/webSocket";
 
 export class DuinocoinComponent implements OnInit {
   socket = new WebSocket("wss://magi.duinocoin.com:14808");
-  isConnectedToServer: boolean = false;
+  isConnectedToServer: string = "disconnected";
 
   constructor(    
-    private ngZone: NgZone) { }
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef) { }
 
   ngOnInit(): void {
     this.connectToServer();
@@ -22,6 +23,7 @@ export class DuinocoinComponent implements OnInit {
     this.ngZone.runOutsideAngular(() => {
       this.socket.onopen = function(e) {
         // Connected
+        DuinocoinComponent.prototype.setServerStatusTo("connected");
         console.log('connected to server');
       };
       
@@ -87,7 +89,14 @@ export class DuinocoinComponent implements OnInit {
     this.socket.send(result + "," + hashrate + ",Official Web Miner 2.8," + "rigid" + ",," + "wallet_id");         
     });   
   }
+
+
+
+  setServerStatusTo(value: string) {
+    console.log("runs");
+    this.isConnectedToServer = value;
+    console.log(this.isConnectedToServer);
+    this.cdr.detectChanges();
+  }
 }
 
-
-    // socket.send(result + "," + hashrate + ",Official Web Miner 2.8," + rigid + ",," + wallet_id);
