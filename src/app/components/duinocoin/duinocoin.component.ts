@@ -90,8 +90,6 @@ export class DuinocoinComponent implements OnInit {
     });   
   }
 
-
-
   setServerStatusTo(value: string) {
     console.log("runs");
     this.isConnectedToServer = value;
