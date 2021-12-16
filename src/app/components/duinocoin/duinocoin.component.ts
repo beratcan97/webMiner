@@ -8,12 +8,9 @@ import { DuinocoinService } from 'src/app/services/duinocoin.service';
 })
 
 export class DuinocoinComponent implements OnInit {
-  socket = new WebSocket("wss://magi.duinocoin.com:14808");
-  isConnectedToServer: string = "disconnected";
+  isConnectedToServer: string = "ready";
 
-  constructor(    
-    private ngZone: NgZone,
-    private cdr: ChangeDetectorRef,
+  constructor(
     private duinocoinService: DuinocoinService) { }
 
   ngOnInit(): void {
