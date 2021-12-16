@@ -1,9 +1,11 @@
+import { HomepageComponent } from './components/homepage/homepage.component';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { DuinocoinComponent } from './components/duinocoin/duinocoin.component';
 
 const routes: Routes = [
+  { path: '', component: HomepageComponent },
   { path: 'duinocoin', component: DuinocoinComponent }
 ];
 
