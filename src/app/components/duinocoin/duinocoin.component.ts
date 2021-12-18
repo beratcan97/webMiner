@@ -1,5 +1,6 @@
-import { Component, OnInit, NgZone, ChangeDetectorRef} from '@angular/core';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { DuinocoinService } from 'src/app/services/duinocoin.service';
 
 @Component({
@@ -9,15 +10,20 @@ import { DuinocoinService } from 'src/app/services/duinocoin.service';
 })
 
 export class DuinocoinComponent implements OnInit {
+  // Mining
   ngUnsubscribe = new Subject();
   status$: Observable<string>;
   log$: Observable<any>;
   acceptedShares$: Observable<any>;
   badShares$: Observable<any>;
 
+  // Settings
+  isSettingGui: boolean = true;
+  settingsForm: FormGroup = this.fb.group({});
+
   constructor(
     private duinocoinService: DuinocoinService,
-    private ngZone: NgZone) {
+    private fb: FormBuilder) {
     this.status$ = this.duinocoinService.tmp$.pipe(takeUntil(this.ngUnsubscribe));
     this.log$ = this.duinocoinService.log$.pipe(takeUntil(this.ngUnsubscribe));
     this.acceptedShares$ = this.duinocoinService.acceptedShares$.pipe(takeUntil(this.ngUnsubscribe));
@@ -25,11 +31,20 @@ export class DuinocoinComponent implements OnInit {
     }
 
   ngOnInit(): void {
+    this.createForm();
     this.duinocoinService.connectToServerObs().subscribe();
   }
 
   startMining(): void {
-    this.duinocoinService.startMining();
+    this.isSettingGui = false;
+    this.duinocoinService.startMining(this.settingsForm.value);
+  }
+
+  createForm(): void {
+    this.settingsForm = this.fb.group({
+      username: 'anderson123',
+      rigName: 'Webminer',
+    });
   }
 }
 

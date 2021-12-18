@@ -19,6 +19,9 @@ export class DuinocoinService {
   public badShares = new BehaviorSubject<number>(0);
   public readonly badShares$: Observable<number> = this.badShares.asObservable();
 
+  miningUsername: string = '';
+  rigName: string = '';
+
   constructor() { }
 
   connectToServerObs(): Observable <any> {
@@ -31,7 +34,7 @@ export class DuinocoinService {
 
       // On message
       this.socket.onmessage = (event) => {
-        if(event.data === '2.7') {
+        if(event.data === '2.8') {
           // Got server Version
           this.tmpLog.next(event.data);
         } else if(event.data === 'GOOD\n') {
@@ -39,7 +42,6 @@ export class DuinocoinService {
           this.acceptedShares.next(this.acceptedShares.value + 1);
           this.tmpLog.next("Share accepted");
           this.socket.send('JOB,anderson123,LOW');
-          //DuinocoinComponent.prototype.startMining();
         } else if(event.data === 'BAD,Incorrect result') {
           //FAILED 
           this.badShares.next(this.badShares.value + 1);
@@ -51,24 +53,22 @@ export class DuinocoinService {
           this.tmpLog.next('Hash recived: ' + event.data);
           let job = event.data.split(",");
           let difficulty: number =  Number(job[2]);
-          
-            let startingTime = performance.now();
-            for (let result = 0; result < 100 * difficulty + 1; result++) {
-              // @ts-ignore
-              let SHA1 = new Hashes.SHA1();
-              let ducos1 = SHA1.hex(job[0] + result);
-              if (job[1] === ducos1) {
-                  console.log('Miner found a result: ' + result);
-                  let endingTime = performance.now();
-                  let timeDifference = (endingTime - startingTime) / 1000;
-                  let hashrate = (result / timeDifference).toFixed(2);
-                  //this.sendResultToServer(result, hashrate);
-                  this.tmpLog.next("Sending result");
-                  this.socket.send(result + "," + hashrate + ",WebMiner," + "rigid" + ",," + "wallet_id");         
-                  console.log(result + "," + hashrate + ",WebMiner," + "rigid" + ",," + "wallet_id");         
-                  return;
-              }
+          let startingTime = performance.now();
+          for (let result = 0; result < 100 * difficulty + 1; result++) {
+            // @ts-ignore
+            let SHA1 = new Hashes.SHA1();
+            let ducos1 = SHA1.hex(job[0] + result);
+            if (job[1] === ducos1) {
+                console.log('Miner found a result: ' + result);
+                let endingTime = performance.now();
+                let timeDifference = (endingTime - startingTime) / 1000;
+                let hashrate = (result / timeDifference).toFixed(2);
+                this.tmpLog.next("Sending result");
+                this.socket.send(result + "," + hashrate + ",WebMiner," + this.rigName + ",," + "wallet_id");         
+                console.log(result + "," + hashrate + ",WebMiner," + this.rigName + ",," + "wallet_id");         
+                return;
             }
+          }
         } else {
           console.error("NOT HANLED ERROR");
         }
@@ -78,7 +78,7 @@ export class DuinocoinService {
         observer.error(event);
       }
       this.socket.onclose = (event) => {
-        this.serverStatus.next("Disconnected ");
+        this.serverStatus.next("Disconnected");
         observer.complete();
       }
       // a callback invoked on unsubscribe() return () => this.ws.close(1000, "The user disconnected");
@@ -86,9 +86,16 @@ export class DuinocoinService {
   )
   }
 
+  startMining(settingsForm: any): void {
+    this.miningUsername = settingsForm.username;
+    this.rigName = settingsForm.rigName;
+  
+    this.tmpLog.next('Mining for worker' +  this.miningUsername + 'started!');
+    this.socket.send('JOB,' + this.miningUsername + ',LOW');
+  }
 
-  startMining(): void {
-    this.tmpLog.next("Mining for worker anderson123 started!");
-    this.socket.send('JOB,anderson123,LOW');
+  stopMining(): void {
+    this.tmpLog.next('Mining stoped!');
+    this.socket.send('JOB,' + this.miningUsername + ',LOW');
   }
 }
