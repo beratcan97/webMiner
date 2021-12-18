@@ -1,17 +1,19 @@
 import { Injectable } from '@angular/core';
+import { DuinocoinComponent } from '../components/duinocoin/duinocoin.component';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DuinocoinService {
-
   socket = new WebSocket("wss://magi.duinocoin.com:14808");
+  connectionStatus: string = "Ready";
 
   constructor() { }
 
   connectToServer(): void {
     this.socket.onopen = function(e) {
       // Connected
+      DuinocoinComponent.prototype.updateServerStatus("Connected to server");
       console.log('connected to server');
     };
     
@@ -57,10 +59,12 @@ export class DuinocoinService {
      };
 
     this.socket.onclose = function(e) {
+      DuinocoinComponent.prototype.updateServerStatus("Socket closed");
       console.log('Socket closed');
     };
 
     this.socket.onerror = function(err) {
+      DuinocoinComponent.prototype.updateServerStatus("Socket error");
       console.error(err);
     };
   }

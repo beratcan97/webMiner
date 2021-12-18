@@ -1,4 +1,11 @@
 
 <h1>DuinoCoin <img src="https://duinocoin.com/assets/icons/duco.svg" alt="DuinoCoin logo" height="35"></h1>
-<p>Server status: {{isConnectedToServer}}!</p>
-<button type="button" class="btn btn-primary" (click)="startMining()">Start mining <i class="fas fa-hammer"></i></button>
+<p>Server status: {{status}}!</p>
+<button type="button" class="btn btn-primary" (click)="startMining()" *ngIf="!isConnectedToServer">Start mining <i class="fas fa-hammer"></i></button>
+
+
+<p>Go to official <a href="https://wallet.duinocoin.com/" target="_blank" rel="noopener noreferrer">WebWallet</a>.</p>
+
+
+
+

@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { RouterModule } from '@angular/router';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
+import { StatsComponent } from './components/stats/stats.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { HomepageComponent } from './components/homepage/homepage.component';
     NavbarComponent,
     DuinocoinComponent,
     HomepageComponent,
+    StatsComponent,
   ],
   imports: [
     BrowserModule,
