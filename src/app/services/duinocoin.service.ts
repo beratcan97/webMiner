@@ -1,76 +1,94 @@
 import { Injectable } from '@angular/core';
-import { DuinocoinComponent } from '../components/duinocoin/duinocoin.component';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DuinocoinService {
   socket = new WebSocket("wss://magi.duinocoin.com:14808");
-  connectionStatus: string = "Ready";
+
+  public serverStatus = new BehaviorSubject('Ready');
+  public readonly tmp$: Observable<string> = this.serverStatus.asObservable();
+
+  public tmpLog = new BehaviorSubject<string>('');
+  public readonly log$: Observable<string> = this.tmpLog.asObservable();
+
+  public acceptedShares = new BehaviorSubject<number>(0);
+  public readonly acceptedShares$: Observable<number> = this.acceptedShares.asObservable();
+
+  public badShares = new BehaviorSubject<number>(0);
+  public readonly badShares$: Observable<number> = this.badShares.asObservable();
 
   constructor() { }
 
-  connectToServer(): void {
-    this.socket.onopen = function(e) {
-      // Connected
-      DuinocoinComponent.prototype.updateServerStatus("Connected to server");
-      console.log('connected to server');
-    };
-    
-    this.socket.onmessage = function(event) {
-      if(event.data === '2.7') {
-        // Got server Version
-        console.log('Server version: ' + event.data);
-      } else if(event.data === 'GOOD\n') {
-        // Share accepted
-        console.log('GOOD');
-        this.send('JOB,anderson123,LOW');
-        //DuinocoinComponent.prototype.startMining();
-      } else if(event.data === 'BAD,Incorrect result') {
-        //FAILED 
-        console.error('BAD,Incorrect result');
-      } else if(event.data.split(",").length == 3) {
-        // Gets the job
-        console.log('Hash recived: ' + event.data);
-        console.log('Worker started mining');
-
-        let job = event.data.split(",");
-        let difficulty: number =  Number(job[2]);
-        
-          let startingTime = performance.now();
-          for (let result = 0; result < 100 * difficulty + 1; result++) {
-            // @ts-ignore
-            let SHA1 = new Hashes.SHA1();
-            let ducos1 = SHA1.hex(job[0] + result);
-            if (job[1] === ducos1) {
-                console.log('Miner found a result: ' + result);
-                let endingTime = performance.now();
-                let timeDifference = (endingTime - startingTime) / 1000;
-                let hashrate = (result / timeDifference).toFixed(2);
-                //this.sendResultToServer(result, hashrate);
-                this.send(result + "," + hashrate + ",WebMiner," + "rigid" + ",," + "wallet_id");         
-                console.log(result + "," + hashrate + ",WebMiner," + "rigid" + ",," + "wallet_id");         
-                return;
-            }
-          }
-      } else {
-        console.error("NOT HANLED ERROR");
+  connectToServerObs(): Observable <any> {
+    return new Observable (
+    observer => {
+      // Connection open
+      this.socket.onopen = (event) => {
+        this.serverStatus.next("Connected");
       }
-     };
 
-    this.socket.onclose = function(e) {
-      DuinocoinComponent.prototype.updateServerStatus("Socket closed");
-      console.log('Socket closed');
-    };
-
-    this.socket.onerror = function(err) {
-      DuinocoinComponent.prototype.updateServerStatus("Socket error");
-      console.error(err);
-    };
+      // On message
+      this.socket.onmessage = (event) => {
+        if(event.data === '2.7') {
+          // Got server Version
+          this.tmpLog.next(event.data);
+        } else if(event.data === 'GOOD\n') {
+          // Share accepted
+          this.acceptedShares.next(this.acceptedShares.value + 1);
+          this.tmpLog.next("Share accepted");
+          this.socket.send('JOB,anderson123,LOW');
+          //DuinocoinComponent.prototype.startMining();
+        } else if(event.data === 'BAD,Incorrect result') {
+          //FAILED 
+          this.badShares.next(this.badShares.value + 1);
+          this.tmpLog.next("BAD,Incorrect result");
+          console.error('BAD,Incorrect result');
+        } else if(event.data.split(",").length == 3) {
+          // Gets the job
+          this.serverStatus.next("Mining");
+          this.tmpLog.next('Hash recived: ' + event.data);
+          let job = event.data.split(",");
+          let difficulty: number =  Number(job[2]);
+          
+            let startingTime = performance.now();
+            for (let result = 0; result < 100 * difficulty + 1; result++) {
+              // @ts-ignore
+              let SHA1 = new Hashes.SHA1();
+              let ducos1 = SHA1.hex(job[0] + result);
+              if (job[1] === ducos1) {
+                  console.log('Miner found a result: ' + result);
+                  let endingTime = performance.now();
+                  let timeDifference = (endingTime - startingTime) / 1000;
+                  let hashrate = (result / timeDifference).toFixed(2);
+                  //this.sendResultToServer(result, hashrate);
+                  this.tmpLog.next("Sending result");
+                  this.socket.send(result + "," + hashrate + ",WebMiner," + "rigid" + ",," + "wallet_id");         
+                  console.log(result + "," + hashrate + ",WebMiner," + "rigid" + ",," + "wallet_id");         
+                  return;
+              }
+            }
+        } else {
+          console.error("NOT HANLED ERROR");
+        }
+      }
+      this.socket.onerror = (event) => {
+        this.serverStatus.next("Error");
+        observer.error(event);
+      }
+      this.socket.onclose = (event) => {
+        this.serverStatus.next("Disconnected ");
+        observer.complete();
+      }
+      // a callback invoked on unsubscribe() return () => this.ws.close(1000, "The user disconnected");
+    }
+  )
   }
 
+
   startMining(): void {
-    console.log('Mining for worker anderson123 started!');
+    this.tmpLog.next("Mining for worker anderson123 started!");
     this.socket.send('JOB,anderson123,LOW');
   }
 }
