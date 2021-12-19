@@ -9,6 +9,7 @@ import { NavbarComponent } from './components/navbar/navbar.component';
 import { HomepageComponent } from './components/homepage/homepage.component';
 import { StatsComponent } from './components/stats/stats.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { FaqComponent } from './components/faq/faq.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { ReactiveFormsModule } from '@angular/forms';
     DuinocoinComponent,
     HomepageComponent,
     StatsComponent,
+    FaqComponent,
   ],
   imports: [
     BrowserModule,
