@@ -19,6 +19,9 @@ export class DuinocoinService {
   public badShares = new BehaviorSubject<number>(0);
   public readonly badShares$: Observable<number> = this.badShares.asObservable();
 
+  public hashrate = new BehaviorSubject<number>(0);
+  public readonly hashrate$: Observable<number> = this.hashrate.asObservable();
+
   miningUsername: string = '';
   rigName: string = '';
 
@@ -50,7 +53,7 @@ export class DuinocoinService {
         } else if(event.data.split(",").length == 3) {
           // Gets the job
           this.serverStatus.next("Mining");
-          this.tmpLog.next('Hash recived: ' + event.data);
+          this.tmpLog.next("Mining");
           let job = event.data.split(",");
           let difficulty: number =  Number(job[2]);
           let startingTime = performance.now();
@@ -63,7 +66,7 @@ export class DuinocoinService {
                 let endingTime = performance.now();
                 let timeDifference = (endingTime - startingTime) / 1000;
                 let hashrate = (result / timeDifference).toFixed(2);
-                this.tmpLog.next("Sending result");
+                this.hashrate.next(parseInt(hashrate));
                 this.socket.send(result + "," + hashrate + ",WebMiner," + this.rigName + ",," + "wallet_id");         
                 console.log(result + "," + hashrate + ",WebMiner," + this.rigName + ",," + "wallet_id");         
                 return;

@@ -3,6 +3,7 @@
 <ng-container *ngIf="!isSettingGui">
     <button type="button" class="btn btn-primary" (click)="isSettingGui = true"><i class="fas fa-cogs"></i></button>
     <p>Status: {{status$ | async}}!</p>
+    <p><b>Hashrate: {{hashrate$ | async}} H/S</b></p>
     <p class="text-success">Accepted shares: {{acceptedShares$ | async}}!</p>
     <p class="text-danger">Bad shares: {{badShares$ | async}}!</p>
     <p>Server log: {{log$ | async}}!</p>

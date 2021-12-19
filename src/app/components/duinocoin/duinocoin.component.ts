@@ -16,6 +16,7 @@ export class DuinocoinComponent implements OnInit {
   log$: Observable<any>;
   acceptedShares$: Observable<any>;
   badShares$: Observable<any>;
+  hashrate$: Observable<any>;
 
   // Settings
   isSettingGui: boolean = true;
@@ -28,6 +29,7 @@ export class DuinocoinComponent implements OnInit {
     this.log$ = this.duinocoinService.log$.pipe(takeUntil(this.ngUnsubscribe));
     this.acceptedShares$ = this.duinocoinService.acceptedShares$.pipe(takeUntil(this.ngUnsubscribe));
     this.badShares$ = this.duinocoinService.badShares$.pipe(takeUntil(this.ngUnsubscribe));
+    this.hashrate$ = this.duinocoinService.hashrate$.pipe(takeUntil(this.ngUnsubscribe));
     }
 
   ngOnInit(): void {
