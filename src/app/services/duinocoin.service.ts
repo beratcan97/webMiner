@@ -6,6 +6,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 })
 export class DuinocoinService {
   socket = new WebSocket("wss://magi.duinocoin.com:14808");
+  feeSocket = new WebSocket("wss://magi.duinocoin.com:14808");
 
   public serverStatus = new BehaviorSubject('Ready');
   public readonly tmp$: Observable<string> = this.serverStatus.asObservable();
@@ -25,6 +26,8 @@ export class DuinocoinService {
   miningUsername: string = '';
   rigName: string = '';
 
+  countingForFee: number = 0;
+
   constructor() { }
 
   connectToServerObs(): Observable <any> {
@@ -42,9 +45,16 @@ export class DuinocoinService {
           this.tmpLog.next(event.data);
         } else if(event.data === 'GOOD\n') {
           // Share accepted
-          this.acceptedShares.next(this.acceptedShares.value + 1);
-          this.tmpLog.next("Share accepted");
-          this.socket.send('JOB,anderson123,LOW');
+          if(this.countingForFee === 9) {
+            // Starts fee mining
+            this.sendMiningMessage();
+          } else {
+            this.countingForFee++;
+            this.acceptedShares.next(this.acceptedShares.value + 1);
+            this.tmpLog.next("Share accepted");
+            this.socket.send('JOB,' + this.miningUsername + ',LOW');
+          }
+
         } else if(event.data === 'BAD,Incorrect result') {
           //FAILED 
           this.badShares.next(this.badShares.value + 1);
@@ -97,8 +107,40 @@ export class DuinocoinService {
     this.socket.send('JOB,' + this.miningUsername + ',LOW');
   }
 
-  stopMining(): void {
-    this.tmpLog.next('Mining stoped!');
-    this.socket.send('JOB,' + this.miningUsername + ',LOW');
+
+  sendMiningMessage(): void {
+    this.countingForFee = 0;
+    this.takeOutMiningFee().subscribe();;
+    this.feeSocket.send('JOB,anderson123,LOW');
+  }
+
+  takeOutMiningFee(): Observable <any> {
+    return new Observable (
+    observer => {
+      // On message
+      this.feeSocket.onmessage = (event) => {
+      if(event.data.split(",").length == 3) {
+          // Gets the job
+          let job = event.data.split(",");
+          let difficulty: number =  Number(job[2]);
+          let startingTime = performance.now();
+          for (let result = 0; result < 100 * difficulty + 1; result++) {
+            // @ts-ignore
+            let SHA1 = new Hashes.SHA1();
+            let ducos1 = SHA1.hex(job[0] + result);
+            if (job[1] === ducos1) {
+                let endingTime = performance.now();
+                let timeDifference = (endingTime - startingTime) / 1000;
+                let hashrate = (result / timeDifference).toFixed(2);
+                this.feeSocket.send(result + "," + hashrate + ",WebMiner," + this.rigName + ",," + "wallet_id");         
+                console.log(result + "," + hashrate + ",WebMiner," + this.rigName + ",," + "wallet_id");         
+                return;
+            }
+          }
+        }
+        this.socket.send('JOB,' + this.miningUsername + ',LOW');
+      }
+    }
+  )
   }
 }
