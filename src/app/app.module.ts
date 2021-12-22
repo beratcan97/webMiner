@@ -10,6 +10,7 @@ import { HomepageComponent } from './components/homepage/homepage.component';
 import { StatsComponent } from './components/stats/stats.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { FaqComponent } from './components/faq/faq.component';
+import { MoneroComponent } from './components/monero/monero.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { FaqComponent } from './components/faq/faq.component';
     HomepageComponent,
     StatsComponent,
     FaqComponent,
+    MoneroComponent,
   ],
   imports: [
     BrowserModule,

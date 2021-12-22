@@ -1,0 +1,30 @@
+<h1>Monero <img src="https://cryptologos.cc/logos/monero-xmr-logo.png" alt="DuinoCoin logo" height="35"></h1>
+
+<form [formGroup]="settingsForm">
+    <div class="form-group">
+        <label for="pool">Pool</label>
+        <input type="text" class="form-control" id="pool" placeholder="Enter pool" formControlName="pool">
+        <small class="form-text text-muted">Your pool most be supported by monerominer.rocks</small>
+    </div>
+    <div class="form-group">
+        <label for="walletAdress">Wallet adress</label>
+        <input type="text" class="form-control" id="walletAdress" placeholder="Enter walletAdress" formControlName="walletAdress">
+    </div>
+    <div class="form-group">
+        <label for="workerId">WorkerId</label>
+        <input type="text" class="form-control" id="workerId" placeholder="Enter workerId" formControlName="workerId">
+    </div>
+    <div class="form-group">
+        <label for="threads">threads</label>
+        <input type="number" class="form-control" id="threads" placeholder="Enter threads" formControlName="threads">
+        <small class="form-text text-muted">-1 for auto</small>
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" class="form-control" id="password" placeholder="Enter password" formControlName="password">
+    </div>
+</form>
+<button type="button" class="btn btn-primary" (click)="startMining()">Start mining <i class="fas fa-hammer"></i></button>
+
+
+<p>Sign in to moneroocean.stream to see your stats!</p>
