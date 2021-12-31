@@ -12,9 +12,9 @@ DuinoCoin for now
 
 $ npm i angular-cli-ghpages --save-dev
 
-$ ng build --prod --base-href "https://GithubUserName.github.io/GithubRepoName/"
+$ ng build --prod --base-href "https://beratcan97.github.io/webMiner/"
 
-$ npx angular-cli-ghpages --dir=dist/Project-name
+$ npx angular-cli-ghpages --dir=dist/webMiner
 
 
- https://GithubUserName.github.io/GithubRepoName/
+ https://beratcan97.github.io/webMiner/
