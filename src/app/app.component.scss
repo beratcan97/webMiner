@@ -4,3 +4,15 @@
     background-color: grey;
 }
 
+.container {
+    margin-top: 2rem;
+    padding-left: 2em;
+    padding-right: 2rem;
+}
+
+@media (min-width: 768px) {
+    .container {
+        margin-left: 5rem;
+        margin-right: 5rem;
+    }
+}
