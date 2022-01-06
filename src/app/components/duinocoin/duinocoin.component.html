@@ -1,6 +1,6 @@
 <h1>DuinoCoin <img src="https://duinocoin.com/assets/icons/duco.svg" alt="DuinoCoin logo" height="35"></h1>
 <p>Status: {{status$ | async}}!</p>
-
+<p>Status: {{difficulty}}!</p>
 <ng-container *ngIf="!isSettingGui">
     <button type="button" class="btn btn-primary" (click)="false"><i class="fas fa-cogs"></i></button>
     <p><b>Hashrate: {{hashrate$ | async}} H/S</b></p>
@@ -23,6 +23,14 @@
       <div class="form-group">
         <label for="rigName">Rig name</label>
         <input type="text" class="form-control" id="rigName" placeholder="Enter Rig name" formControlName="rigName">
+      </div>
+      <div class="form-group">
+        <label for="difficulty">Difficulty</label>
+        <div id="difficulty">
+          <button type="button" class="btn btn-primary" (click)="difficulty = 'LOW'">LOW</button>
+          <button type="button" class="btn btn-primary" (click)="difficulty = 'MEDIUM'">MEDIUM</button>
+          <button type="button" class="btn btn-primary" (click)="difficulty = 'HARD'">HARD</button>
+        </div>
       </div>
   </form>
   <button type="button" class="btn btn-primary" (click)="startMining()" *ngIf="(status$ | async) === 'Connected'">Start mining <i class="fas fa-hammer"></i></button>

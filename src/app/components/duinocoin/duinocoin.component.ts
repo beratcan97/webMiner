@@ -21,6 +21,8 @@ export class DuinocoinComponent implements OnInit {
   // Settings
   isSettingGui: boolean = true;
   settingsForm: FormGroup = this.fb.group({});
+  difficulty: string = "LOW";
+
 
   constructor(
     private duinocoinService: DuinocoinService,
@@ -39,7 +41,11 @@ export class DuinocoinComponent implements OnInit {
 
   startMining(): void {
     this.isSettingGui = false;
-    this.duinocoinService.startMining(this.settingsForm.value);
+    const tmp = {
+      username: this.settingsForm.value.username,
+      rigName: this.settingsForm.value.rigName,
+    };
+    this.duinocoinService.startMining(tmp, this.difficulty);
   }
 
   createForm(): void {

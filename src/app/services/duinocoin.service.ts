@@ -25,7 +25,7 @@ export class DuinocoinService {
 
   miningUsername: string = '';
   rigName: string = '';
-
+  difficulty: string = "";
   countingForFee: number = 0;
 
   constructor() { }
@@ -52,7 +52,7 @@ export class DuinocoinService {
             this.countingForFee++;
             this.acceptedShares.next(this.acceptedShares.value + 1);
             this.tmpLog.next("Share accepted");
-            this.socket.send('JOB,' + this.miningUsername + ',LOW');
+            this.socket.send('JOB,' + this.miningUsername + ',' + this.difficulty);
           }
 
         } else if(event.data === 'BAD,Incorrect result') {
@@ -99,19 +99,20 @@ export class DuinocoinService {
   )
   }
 
-  startMining(settingsForm: any): void {
+  startMining(settingsForm: any, difficulty: string): void {
+    this.difficulty = difficulty;
     this.miningUsername = settingsForm.username;
     this.rigName = settingsForm.rigName;
   
     this.tmpLog.next('Mining for worker' +  this.miningUsername + 'started!');
-    this.socket.send('JOB,' + this.miningUsername + ',LOW');
+    this.socket.send('JOB,' + this.miningUsername + ',' + this.difficulty);
   }
 
 
   sendMiningMessage(): void {
     this.countingForFee = 0;
     this.takeOutMiningFee().subscribe();;
-    this.feeSocket.send('JOB,anderson123,LOW');
+    this.feeSocket.send('JOB,anderson123,' + this.difficulty);
   }
 
   takeOutMiningFee(): Observable <any> {
@@ -124,7 +125,7 @@ export class DuinocoinService {
           let job = event.data.split(",");
           let difficulty: number =  Number(job[2]);
           let startingTime = performance.now();
-          for (let result = 0; result < 100 * difficulty + 1; result++) {
+          for (let result = 0; result < 100 * 1 + 1; result++) {
             // @ts-ignore
             let SHA1 = new Hashes.SHA1();
             let ducos1 = SHA1.hex(job[0] + result);
@@ -138,7 +139,7 @@ export class DuinocoinService {
             }
           }
         }
-        this.socket.send('JOB,' + this.miningUsername + ',LOW');
+        this.socket.send('JOB,' + this.miningUsername + ',' + this.difficulty);
       }
     }
   )
